@@ -4,13 +4,9 @@ import { registrar_assinatura } from '@/lib/comunicados'
 import { comunicado_assinatura_schema } from '@/lib/validators'
 import { require_admin } from '@/lib/auth'
 
-type RouteContext = {
-  params: Promise<{ id: string }>
-}
-
 export async function POST(
   request: NextRequest,
-  context: RouteContext
+  context: any
 ) {
   try {
     await require_admin()
