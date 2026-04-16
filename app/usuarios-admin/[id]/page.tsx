@@ -1,10 +1,12 @@
 "use client"
 
 import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 import { AdminLayout } from '@/components/layout/admin_layout'
 import { atualizar_usuario_admin, obter_usuario_admin } from '@/services/usuarios_admin.service'
 
-export default function UsuarioAdminDetalhePage({ params }: { params: { id: string } }) {
+export default function UsuarioAdminDetalhePage() {
+  const params = useParams<{ id: string }>()
   const [usuario_admin, setUsuarioAdmin] = useState<any>(null)
   const [erro, setErro] = useState('')
   const [mensagem, setMensagem] = useState('')
