@@ -1,62 +1,66 @@
-"use client"
+'use client'
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { confirmar_por_token, obter_confirmacao_por_token } from '@/services/confirmacao.service'
+import {
+  obter_confirmacao_por_token,
+  confirmar_por_token
+} from '@/services/comunicados.service'
 
 export default function ConfirmacaoPage() {
   const params = useParams<{ token: string }>()
-  const [estado, setEstado] = useState<'carregando' | 'invalido' | 'expirado' | 'utilizado' | 'valido' | 'confirmado'>('carregando')
+  const token = params.token
+
   const [data, setData] = useState<any>(null)
   const [erro, setErro] = useState('')
+  const [sucesso, setSucesso] = useState(false)
 
   useEffect(() => {
     async function carregar() {
       try {
-        const response = await obter_confirmacao_por_token(params.token)
+        const response = await obter_confirmacao_por_token(token)
         setData(response)
-        if (response.token_status === 'invalido') setEstado('invalido')
-        else if (response.token_status === 'expirado') setEstado('expirado')
-        else if (response.token_status === 'utilizado') setEstado('utilizado')
-        else setEstado('valido')
       } catch (e: any) {
-        setErro(e?.mensagem || 'Erro ao validar token')
-        setEstado('invalido')
+        setErro(e?.mensagem || 'Erro ao carregar confirmação')
       }
     }
-    carregar()
-  }, [params.token])
+
+    if (token) {
+      carregar()
+    }
+  }, [token])
 
   async function handle_confirmar() {
-    try { await confirmar_por_token(params.token); setEstado('confirmado') } catch (e: any) { setErro(e?.mensagem || 'Erro ao confirmar ciência') }
+    try {
+      await confirmar_por_token(token)
+      setSucesso(true)
+    } catch (e: any) {
+      setErro(e?.mensagem || 'Erro ao confirmar')
+    }
+  }
+
+  if (erro) {
+    return <p className="error_text">{erro}</p>
+  }
+
+  if (sucesso) {
+    return <p className="success_text">Confirmação realizada com sucesso</p>
+  }
+
+  if (!data) {
+    return <p>Carregando...</p>
   }
 
   return (
     <main>
       <div className="container stack">
-        <div className="card stack">
-          {estado === 'carregando' ? <h1 className="page_title">Carregando...</h1> : null}
-          {estado === 'invalido' ? <h1 className="page_title">Token inválido</h1> : null}
-          {estado === 'expirado' ? <h1 className="page_title">Token expirado</h1> : null}
-          {estado === 'utilizado' ? <h1 className="page_title">Token já utilizado</h1> : null}
-          {estado === 'confirmado' ? <h1 className="page_title">Confirmação registrada com sucesso</h1> : null}
-          {estado === 'valido' ? (
-            <>
-              <h1 className="page_title">{data?.comunicado?.titulo}</h1>
-              <div>{data?.comunicado?.conteudo}</div>
-              <div className="table_like">
-                {(data?.anexos || []).map((anexo: any) => (
-                  <div className="table_item" key={anexo.id}>
-                    <div><strong>nome_arquivo:</strong> {anexo.nome_arquivo}</div>
-                    <div><strong>tipo_arquivo:</strong> {anexo.tipo_arquivo}</div>
-                  </div>
-                ))}
-              </div>
-              <button onClick={handle_confirmar}>Confirmo que li e estou ciente</button>
-            </>
-          ) : null}
-          {erro ? <p className="error_text">{erro}</p> : null}
-        </div>
+        <h1>{data.comunicado.titulo}</h1>
+
+        <p>{data.comunicado.conteudo}</p>
+
+        <button className="button" onClick={handle_confirmar}>
+          Confirmo que li e estou ciente
+        </button>
       </div>
     </main>
   )
