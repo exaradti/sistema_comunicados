@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import {
   obter_confirmacao_por_token,
   confirmar_por_token
-} from '@/services/comunicados.service'
+} from '@/services/confirmacao.service'
 
 export default function ConfirmacaoPage() {
   const params = useParams<{ token: string }>()
