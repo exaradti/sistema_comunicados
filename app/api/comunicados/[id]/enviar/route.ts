@@ -1,19 +1,12 @@
-import { fail, ok } from '@/lib/http'
-import { enviar_comunicado } from '@/lib/comunicados'
 import { require_admin } from '@/lib/auth'
+import { enviar_comunicado } from '@/lib/comunicados'
+import { fail, ok } from '@/lib/http'
 
-export async function POST(
-  _: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(_: Request, context: any) {
   try {
     await require_admin()
-    const { id } = await params
-    return ok(await enviar_comunicado(Number(id)))
+    return ok(await enviar_comunicado(Number(context.params.id)))
   } catch (e: any) {
-    return fail(
-      e.message || 'Erro ao enviar comunicado',
-      e.message === 'não autenticado' ? 401 : 400
-    )
+    return fail(e.message || 'Erro ao enviar comunicado', e.message === 'não autenticado' ? 401 : 400)
   }
 }
