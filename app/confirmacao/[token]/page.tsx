@@ -1,9 +1,11 @@
 "use client"
 
 import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 import { confirmar_por_token, obter_confirmacao_por_token } from '@/services/confirmacao.service'
 
-export default function ConfirmacaoPage({ params }: { params: { token: string } }) {
+export default function ConfirmacaoPage() {
+  const params = useParams<{ token: string }>()
   const [estado, setEstado] = useState<'carregando' | 'invalido' | 'expirado' | 'utilizado' | 'valido' | 'confirmado'>('carregando')
   const [data, setData] = useState<any>(null)
   const [erro, setErro] = useState('')
