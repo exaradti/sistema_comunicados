@@ -1,19 +1,12 @@
-import { fail, ok } from '@/lib/http'
-import { obter_comunicado } from '@/lib/comunicados'
 import { require_admin } from '@/lib/auth'
+import { obter_comunicado } from '@/lib/comunicados'
+import { fail, ok } from '@/lib/http'
 
-export async function GET(
-  _: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_: Request, context: any) {
   try {
     await require_admin()
-    const { id } = await params
-    return ok(await obter_comunicado(Number(id)))
+    return ok(await obter_comunicado(Number(context.params.id)))
   } catch (e: any) {
-    return fail(
-      e.message || 'Erro ao obter comunicado',
-      e.message === 'não autenticado' ? 401 : 400
-    )
+    return fail(e.message || 'Erro ao obter comunicado', e.message === 'não autenticado' ? 401 : 400)
   }
 }
