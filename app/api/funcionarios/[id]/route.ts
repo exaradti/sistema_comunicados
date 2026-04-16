@@ -1,22 +1,16 @@
 import { NextRequest } from 'next/server'
-import { fail, get_json, ok } from '@/lib/http'
-import { update_funcionario } from '@/lib/admin_crud'
-import { funcionario_schema } from '@/lib/validators'
+import { atualizar_basico } from '@/lib/admin_crud'
 import { require_admin } from '@/lib/auth'
+import { fail, get_json, ok } from '@/lib/http'
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, context: any) {
   try {
     await require_admin()
-    const { id } = await params
-    const body = funcionario_schema.partial().parse(await get_json(request))
-    return ok({ funcionario: await update_funcionario(Number(id), body) })
+    const body = await get_json<Record<string, unknown>>(request)
+    const { data, error } = await atualizar_basico('funcionarios', Number(context.params.id), body)
+    if (error) return fail(error.message)
+    return ok({ funcionario: data, mensagem: 'Funcionário atualizado com sucesso' })
   } catch (e: any) {
-    return fail(
-      e.message || 'Erro ao atualizar funcionário',
-      e.name === 'ZodError' ? 422 : e.message === 'não autenticado' ? 401 : 400
-    )
+    return fail(e.message || 'Erro ao atualizar funcionário', 400)
   }
 }
