@@ -3,7 +3,32 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { obter_comunicado, enviar_comunicado } from '@/services/comunicados.service'
-import { ObterComunicadoResponse } from '@/types/comunicado'
+
+type ObterComunicadoResponse = {
+  comunicado: {
+    id: number
+    titulo: string
+    categoria: string
+    conteudo: string
+    tipo_confirmacao: string
+    status: string
+  }
+  destinatarios: {
+    id: number
+    funcionario_id: number
+    status: string
+    metodo_confirmacao: string
+    data_envio_email?: string | null
+    data_visualizacao?: string | null
+    data_confirmacao?: string | null
+  }[]
+  anexos: {
+    id: number
+    nome_arquivo: string
+    tipo_arquivo: string
+    tamanho_bytes: number
+  }[]
+}
 
 export default function ComunicadoDetalhePage() {
   const params = useParams<{ id: string }>()
