@@ -1,22 +1,22 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || ''
-
-export async function api_fetch(path: string, options?: RequestInit) {
-  const response = await fetch(`${BASE_URL}${path}`, {
+export async function api_fetch(url: string, options: RequestInit = {}) {
+  const response = await fetch(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...(options?.headers || {})
-    },
-    cache: 'no-store',
-    credentials: 'include'
+      ...(options.headers || {})
+    }
   })
 
-  const content_type = response.headers.get('content-type')
   if (!response.ok) {
-    if (content_type?.includes('application/json')) throw await response.json()
-    throw { erro: 'erro_http', mensagem: await response.text() }
+    let errorMessage = 'Erro na requisição'
+
+    try {
+      const data = await response.json()
+      errorMessage = data?.mensagem || errorMessage
+    } catch {}
+
+    throw new Error(errorMessage)
   }
 
-  if (content_type?.includes('application/json')) return response.json()
-  return null
+  return response.json()
 }
