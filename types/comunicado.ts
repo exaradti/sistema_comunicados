@@ -12,9 +12,9 @@ export type Destinatario = {
   funcionario_id: number
   status: string
   metodo_confirmacao: string
-  data_envio_email?: string
-  data_visualizacao?: string
-  data_confirmacao?: string
+  data_envio_email?: string | null
+  data_visualizacao?: string | null
+  data_confirmacao?: string | null
 }
 
 export type Anexo = {
