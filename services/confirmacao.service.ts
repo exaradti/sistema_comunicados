@@ -5,5 +5,7 @@ export async function obter_confirmacao_por_token(token: string) {
 }
 
 export async function confirmar_por_token(token: string) {
-  return api_fetch(`/api/confirmacao/${token}`, { method: 'POST' })
+  return api_fetch(`/api/confirmacao/${token}`, {
+    method: 'POST'
+  })
 }
