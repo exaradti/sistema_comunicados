@@ -19,11 +19,13 @@ export default function ComunicadoDetalhePage() {
         const response = await obter_comunicado(id)
         setData(response)
       } catch (e: any) {
-        setErro(e.message)
+        setErro(e?.message || 'Erro ao carregar comunicado')
       }
     }
 
-    if (id) carregar()
+    if (id) {
+      carregar()
+    }
   }, [id])
 
   async function handle_enviar() {
@@ -31,22 +33,71 @@ export default function ComunicadoDetalhePage() {
       await enviar_comunicado(id)
       setMensagem('Comunicado enviado com sucesso')
     } catch (e: any) {
-      setErro(e.message)
+      setErro(e?.message || 'Erro ao enviar comunicado')
     }
   }
 
-  if (!data) return <p>Carregando...</p>
+  if (!data) {
+    return <p>Carregando...</p>
+  }
 
   return (
     <main>
-      <h1>{data.comunicado.titulo}</h1>
+      <div className="container stack">
+        <h1 className="page_title">Detalhes do comunicado</h1>
 
-      <p>{data.comunicado.conteudo}</p>
+        {erro ? <p className="error_text">{erro}</p> : null}
+        {mensagem ? <p className="success_text">{mensagem}</p> : null}
 
-      <button onClick={handle_enviar}>Enviar</button>
+        <div className="card stack">
+          <div><strong>titulo:</strong> {data.comunicado.titulo}</div>
+          <div><strong>categoria:</strong> {data.comunicado.categoria}</div>
+          <div><strong>conteudo:</strong> {data.comunicado.conteudo}</div>
+          <div><strong>tipo_confirmacao:</strong> {data.comunicado.tipo_confirmacao}</div>
+          <div><strong>status:</strong> {data.comunicado.status}</div>
 
-      {erro && <p>{erro}</p>}
-      {mensagem && <p>{mensagem}</p>}
+          <div className="row">
+            <button className="button" onClick={handle_enviar}>
+              Enviar comunicado
+            </button>
+          </div>
+        </div>
+
+        <div className="card stack">
+          <h2>destinatarios</h2>
+
+          <div className="table_like">
+            {data.destinatarios.map((destinatario) => (
+              <div className="table_item" key={destinatario.id}>
+                <div><strong>funcionario_id:</strong> {destinatario.funcionario_id}</div>
+                <div><strong>status:</strong> {destinatario.status}</div>
+                <div><strong>metodo_confirmacao:</strong> {destinatario.metodo_confirmacao}</div>
+                <div><strong>data_envio_email:</strong> {destinatario.data_envio_email || '-'}</div>
+                <div><strong>data_visualizacao:</strong> {destinatario.data_visualizacao || '-'}</div>
+                <div><strong>data_confirmacao:</strong> {destinatario.data_confirmacao || '-'}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="card stack">
+          <h2>anexos</h2>
+
+          <div className="table_like">
+            {(data.anexos || []).map((anexo) => (
+              <div className="table_item" key={anexo.id}>
+                <div><strong>nome_arquivo:</strong> {anexo.nome_arquivo}</div>
+                <div><strong>tipo_arquivo:</strong> {anexo.tipo_arquivo}</div>
+                <div><strong>tamanho_bytes:</strong> {anexo.tamanho_bytes}</div>
+              </div>
+            ))}
+
+            {(data.anexos || []).length === 0 ? (
+              <div className="table_item">Nenhum anexo.</div>
+            ) : null}
+          </div>
+        </div>
+      </div>
     </main>
   )
 }
